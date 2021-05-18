@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  # == CHECK == #
+  check:
+    name: Check beta stable and MSRV
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust-toolchains:
+          - 1.39.0  # MSRV
+          - stable
+          - beta
+    steps:
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust-toolchains }}
+          override: true
+
+      - name: Clone repo
+        uses: actions/checkout@v2
+
+      - name: Cargo check
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: |
+            --tests
+            --no-default-features
+
+  # == BUILD & TEST == #
+  build-and-test:
+    name: Build and test
+    runs-on: ${{ matrix.os }}
+    needs: [check]
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        rust-toolchains:
+          - 1.39.0
+          - stable
+          - beta
+    steps:
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          override: true
+          toolchain: ${{ matrix.rust-toolchains }}
+
+      - name: Clone repo
+        uses: actions/checkout@v2
+
+      - name: Cargo test
+        uses: actions-rs/cargo@v1
+        env:
+          RUSTC_BOOTSTRAP: 1
+        with:
+          command: test
+          args: |
+            --doc
+            --no-default-features
+            -- --nocapture
+
+  # == MIRI == #
+  # miri:
+  #   name: Test with miri
+  #   runs-on: [ubuntu-latest]
+  #   needs: [test-nightly]
+  #   strategy:
+  #     matrix:
+  #       feature--alloc: ['', '--features alloc']
+  #   steps:
+  #     - name: Clone repo
+  #       uses: actions/checkout@v2
+
+  #     - name: Test with miri
+  #       run: ./miri_test.sh --no-default-features ${{ matrix.feature--alloc }}

@@ -1,0 +1,27 @@
+[lib]
+path = "mod.rs"
+proc-macro = true
+
+[package]
+name = "fix-hidden-lifetime-bug-proc_macros"
+version = "0.1.0"
+authors = [
+    "Daniel Henry-Mantilla <daniel.henry.mantilla@gmail.com>",
+]
+edition = "2018"
+license = "Zlib OR MIT OR Apache-2.0"
+description = """Proc-macro to write an automatic fix for the "hidden lifetime in impl Trait" issue"""
+repository = "https://github.com/danielhenrymantilla/fix-hidden-lifetime-bug.rs"
+documentation = "https://docs.rs/fix-hidden-lifetime-bug"
+readme = "../../README.md"
+keywords = ["impl", "lifetime", "bug", "hidden", "bound"]
+
+[dependencies]
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = { version = "1.0.7", features = ["full", "visit-mut"] }
+
+[package.metadata.docs.rs]
+targets = [
+    "x86_64-unknown-linux-gnu",
+]
