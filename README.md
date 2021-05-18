@@ -92,6 +92,16 @@ https://github.com/danielhenrymantilla/fix_hidden_lifetime_bug.rs/actions)
 Then you can can the attribute provided by this crate to automagically generate
 an equivalent signature that soothes this grumpy compiler
 
+  - See [the lifetime bug `async` issue], as well as [this other comment](
+    https://github.com/rust-lang/rust/issues/34511#issuecomment-373423999) for
+    more info.
+
+    The fix is thus to perform the unsugaring from an `async fn` to an `fn`
+    yielding a `Future`, and then just adding the necessary `+ Captures<'_>`
+    bounds.
+
+[the lifetime bug `async` issue]: https://github.com/rust-lang/rust/issues/63033
+
 ### Usage
 
  1. `cargo add fix_hidden_lifetime_bug`, or add the following to your `Cargo.toml` file:

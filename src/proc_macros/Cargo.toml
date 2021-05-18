@@ -4,7 +4,7 @@ proc-macro = true
 
 [package]
 name = "fix-hidden-lifetime-bug-proc_macros"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
     "Daniel Henry-Mantilla <daniel.henry.mantilla@gmail.com>",
 ]
