@@ -67,4 +67,5 @@ mod __ {
     pub use ::core;
 }
 
+#[cfg(feature = "proc-macros")]
 extern crate proc_macros;

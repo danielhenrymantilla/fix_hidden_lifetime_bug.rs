@@ -17,6 +17,7 @@ jobs:
           - 1.39.0  # MSRV
           - stable
           - beta
+        features__proc-macros: ["", "--features proc-macros"]
     steps:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
@@ -33,8 +34,8 @@ jobs:
         with:
           command: check
           args: |
-            --tests
             --no-default-features
+            ${{ matrix.features__proc-macros }}
 
   # == BUILD & TEST == #
   build-and-test:
@@ -72,6 +73,7 @@ jobs:
           args: |
             --doc
             --no-default-features
+            --features proc-macros
             -- --nocapture
 
   # == MIRI == #

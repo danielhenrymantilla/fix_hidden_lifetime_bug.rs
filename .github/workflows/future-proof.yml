@@ -53,6 +53,7 @@ jobs:
           args: |
             --doc
             --no-default-features
+            --features proc-macros
             -- --nocapture
 
   # == TEST with MIRI == #
