@@ -1,6 +1,6 @@
 [package]
 name = "fix-hidden-lifetime-bug"
-version = "0.2.0"
+version = "0.2.1-rc1"
 authors = [
     "Daniel Henry-Mantilla <daniel.henry.mantilla@gmail.com>",
 ]
@@ -14,7 +14,7 @@ keywords = ["impl", "lifetime", "bug", "hidden", "bound"]
 
 [dependencies.proc-macros]
 package = "fix-hidden-lifetime-bug-proc_macros"
-version = "0.2.0"
+version = "0.2.1-rc1"
 path = "src/proc_macros"
 optional = true
 
