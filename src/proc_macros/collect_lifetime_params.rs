@@ -2,48 +2,76 @@ use super::*;
 
 /// Identify all the lifetime parameters, introducing new ones to make sure
 /// there are no elided lifetime parameters, and then emit the list of all such
-/// introduced lifetime parameters.
-pub(crate)
+/// lifetime parameters appearing in the function signature.
+pub(in crate)
 fn collect_lifetime_params (
     sig: &'_ mut Signature,
+    outer_scope: Option<&'_ mut ItemImpl>,
 ) -> Vec<Lifetime>
 {
     let mut lifetimes: Vec<Lifetime> =
         sig .generics
             .lifetimes()
-            .map(|&LifetimeDef { ref lifetime, .. }| lifetime.clone())
+            .map(|lt_def| lt_def.lifetime.clone())
             .collect()
     ;
-    let params = &mut sig.generics.params;
-    let mut ns = 0_u16 ..;
     let mut visitor = Visitor {
-        new_lifetime_param: |span: Span| -> Lifetime {
-            let mut lifetime;
-            while {
-                // do
-                lifetime = Lifetime::new(
-                    &format!("'_{}", ns.next().unwrap()),
-                    span,
-                );
-                // while
-                lifetimes.contains(&lifetime)
-            } {}
-            params.insert(lifetimes.len(), parse_quote!(#lifetime));
-            lifetimes.push(lifetime.clone());
-            lifetime
-        },
+        lifetimes: &mut lifetimes,
+        next_idx: 0 ..,
+        params: &mut sig.generics.params,
     };
     sig.inputs.iter_mut().for_each(|arg| visitor.visit_fn_arg_mut(arg));
-    lifetimes
+    if let Some(item_impl) = outer_scope {
+        let mut impl_lifetimes: Vec<Lifetime> =
+            item_impl
+                .generics
+                .lifetimes()
+                .map(|lt_def| lt_def.lifetime.clone())
+                .collect()
+        ;
+        let mut visitor = Visitor {
+            lifetimes: &mut impl_lifetimes,
+            next_idx: visitor.next_idx.next().unwrap() ..,
+            params: &mut item_impl.generics.params,
+        };
+        if let Some((_, ref mut trait_, _)) = item_impl.trait_ {
+            visitor.visit_path_mut(trait_);
+        }
+        visitor.visit_type_mut(&mut *item_impl.self_ty);
+        impl_lifetimes.extend(lifetimes);
+        impl_lifetimes
+    } else {
+        lifetimes
+    }
 }
 
-struct Visitor<NewLifetimeParam : FnMut(Span) -> Lifetime> {
-    new_lifetime_param: NewLifetimeParam,
+struct Visitor<'__> {
+    lifetimes: &'__ mut Vec<Lifetime>,
+    next_idx: ::core::ops::RangeFrom<u16>, // No more that 64K lifetimes, methinks 🙃
+    params: &'__ mut Punctuated<GenericParam, Token![,]>,
 }
 
-impl<NewLifetimeParam : FnMut(Span) -> Lifetime> VisitMut
-    for Visitor<NewLifetimeParam>
-{
+impl Visitor<'_> {
+    fn new_lifetime_param (self: &'_ mut Self, span: Span)
+      -> Lifetime
+    {
+        let mut lifetime;
+        while {
+            // do
+            lifetime = Lifetime::new(
+                &format!("'_{}", self.next_idx.next().unwrap()),
+                span,
+            );
+            // while
+            self.lifetimes.contains(&lifetime)
+        } {}
+        self.params.insert(self.lifetimes.len(), parse_quote!(#lifetime));
+        self.lifetimes.push(lifetime.clone());
+        lifetime
+    }
+}
+
+impl VisitMut for Visitor<'_> {
     fn visit_receiver_mut (
         self: &'_ mut Self,
         receiver: &'_ mut Receiver,
@@ -51,12 +79,12 @@ impl<NewLifetimeParam : FnMut(Span) -> Lifetime> VisitMut
     {
         match receiver.reference {
             | Some((ampersand, ref mut elided @ None)) => {
-                *elided = Some((self.new_lifetime_param)(ampersand.span()))
+                *elided = Some(self.new_lifetime_param(ampersand.span()))
             }
             | Some((_ampersand, Some(ref mut elided)))
                 if elided.ident == "_"
             => {
-                *elided = (self.new_lifetime_param)(elided.span());
+                *elided = self.new_lifetime_param(elided.span());
             },
 
             | _ => {},
@@ -71,12 +99,12 @@ impl<NewLifetimeParam : FnMut(Span) -> Lifetime> VisitMut
         visit_mut::visit_type_reference_mut(self, reference);
         match reference.lifetime {
             | ref mut elided @ None => {
-                *elided = Some((self.new_lifetime_param)(reference.and_token.span()));
+                *elided = Some(self.new_lifetime_param(reference.and_token.span()));
             },
             | Some(ref mut elided)
                 if elided.ident == "_"
             => {
-                *elided = (self.new_lifetime_param)(elided.span());
+                *elided = self.new_lifetime_param(elided.span());
             },
 
             | _ => {},
@@ -89,7 +117,7 @@ impl<NewLifetimeParam : FnMut(Span) -> Lifetime> VisitMut
     )
     {
         if lifetime.ident == "_" {
-            *lifetime = (self.new_lifetime_param)(lifetime.span());
+            *lifetime = self.new_lifetime_param(lifetime.span());
         }
     }
 
@@ -124,7 +152,7 @@ impl<NewLifetimeParam : FnMut(Span) -> Lifetime> VisitMut
             .not()
         {
             // No `+ 'lifetime` on this trait object; insert one.
-            let lt = (self.new_lifetime_param)(dyn_trait.span());
+            let lt = self.new_lifetime_param(dyn_trait.span());
             dyn_trait.bounds.push(TypeParamBound::Lifetime(lt));
         }
     }

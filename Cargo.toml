@@ -1,6 +1,6 @@
 [package]
 name = "fix-hidden-lifetime-bug"
-version = "0.1.1"
+version = "0.2.0"
 authors = [
     "Daniel Henry-Mantilla <daniel.henry.mantilla@gmail.com>",
 ]
@@ -12,12 +12,27 @@ documentation = "https://docs.rs/fix-hidden-lifetime-bug"
 readme = "README.md"
 keywords = ["impl", "lifetime", "bug", "hidden", "bound"]
 
-[dependencies.proc_macros]
+[dependencies.proc-macros]
 package = "fix-hidden-lifetime-bug-proc_macros"
-version = "0.1.1"
+version = "0.2.0"
 path = "src/proc_macros"
+optional = true
+
+[features]
+default = [
+    "proc-macros",
+]
+showme = [
+    "proc-macros/showme",
+]
 
 [package.metadata.docs.rs]
 targets = [
     "x86_64-unknown-linux-gnu",
 ]
+features = [
+    "proc-macros",
+]
+
+[workspace]
+members = ["src/proc_macros"]

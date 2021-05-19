@@ -28,6 +28,8 @@ jobs:
     steps:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
+        env:
+          RUSTUP_UNPACK_RAM: 134217728  # Use 128 MiB rather than 500
         with:
           profile: minimal
           override: true
