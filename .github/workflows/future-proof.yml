@@ -25,6 +25,10 @@ jobs:
           - beta
           - nightly
         latest-lockfile: [true, false]
+        exclude:
+          # This setup very often fails with a memory allocation failure on GH.
+          - os: windows-latest
+            rust-toolchains: 1.39.0
     steps:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
