@@ -4,7 +4,7 @@ proc-macro = true
 
 [package]
 name = "fix-hidden-lifetime-bug-proc_macros"
-version = "0.2.1-rc1"
+version = "0.2.1-rc2"
 authors = [
     "Daniel Henry-Mantilla <daniel.henry.mantilla@gmail.com>",
 ]
@@ -18,8 +18,8 @@ keywords = ["impl", "lifetime", "bug", "hidden", "bound"]
 
 [dependencies]
 bat = { optional = true, version = "0.15.4" }
-proc-macro2 = "1.0"
-quote = "1.0"
+proc-macro2 = "1.0.0"
+quote = "1.0.0"
 syn = { version = "1.0.7", features = ["full", "visit-mut"] }
 
 [features]
