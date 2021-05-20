@@ -2,15 +2,15 @@
 
 [![Repository](https://img.shields.io/badge/repository-GitHub-brightgreen.svg)](
 https://github.com/danielhenrymantilla/fix_hidden_lifetime_bug.rs)
-[![Latest version](https://img.shields.io/crates/v/fix_hidden_lifetime_bug.svg)](
-https://crates.io/crates/fix_hidden_lifetime_bug)
-[![Documentation](https://docs.rs/fix_hidden_lifetime_bug/badge.svg)](
-https://docs.rs/fix_hidden_lifetime_bug)
+[![Latest version](https://img.shields.io/crates/v/fix-hidden-lifetime-bug.svg)](
+https://crates.io/crates/fix-hidden-lifetime-bug)
+[![Documentation](https://docs.rs/fix-hidden-lifetime-bug/badge.svg)](
+https://docs.rs/fix-hidden-lifetime-bug)
 [![MSRV](https://img.shields.io/badge/MSRV-1.39.0-white)](
 https://gist.github.com/danielhenrymantilla/8e5b721b3929084562f8f65668920c33)
 [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](
 https://github.com/rust-secure-code/safety-dance/)
-[![License](https://img.shields.io/crates/l/fix_hidden_lifetime_bug.svg)](
+[![License](https://img.shields.io/crates/l/fix-hidden-lifetime-bug.svg)](
 https://github.com/danielhenrymantilla/fix_hidden_lifetime_bug.rs/blob/master/LICENSE-ZLIB)
 [![CI](https://github.com/danielhenrymantilla/fix_hidden_lifetime_bug.rs/workflows/CI/badge.svg)](
 https://github.com/danielhenrymantilla/fix_hidden_lifetime_bug.rs/actions)
@@ -21,20 +21,20 @@ https://github.com/danielhenrymantilla/fix_hidden_lifetime_bug.rs/actions)
     error[E0700]: hidden type for `impl Trait` captures lifetime that does not appear in bounds
       --> examples/main.rs:13:40
        |
-    13 | fn foo<'a, 'b> (it: &'a mut &'b ()) -> impl 'a + Sized {
-       |                                        ^^^^^^^^^^^^^^^
+    13 | fn foo<'a, 'b>(it: &'a mut &'b ()) -> impl 'a + Sized {
+       |                                       ^^^^^^^^^^^^^^^
        |
     note: hidden type `&'a mut &'b ()` captures the lifetime `'b` as defined on the function body at 13:12
       --> examples/main.rs:13:12
        |
-    13 | fn foo<'a, 'b> (it: &'a mut &'b ()) -> impl 'a + Sized {
+    13 | fn foo<'a, 'b>(it: &'a mut &'b ()) -> impl 'a + Sized {
        |            ^^
     ```
 
     <details><summary>Problematic code</summary>
 
     ```rust,compile_fail
-    fn foo<'a, 'b> (it: &'a mut &'b ()) -> impl 'a + Sized {
+    fn foo<'a, 'b>(it: &'a mut &'b ()) -> impl 'a + Sized {
         it
     }
     ```
@@ -73,20 +73,20 @@ https://github.com/danielhenrymantilla/fix_hidden_lifetime_bug.rs/actions)
     error[E0700]: hidden type for `impl Trait` captures lifetime that does not appear in bounds
      --> examples/main.rs:4:57
       |
-    4 | async fn baz<'a> (a: &'static (), b: &'_ (), c: &'_ ()) {
-      |                                                         ^
+    4 | async fn baz<'a>(a: &'static (), b: &(), c: &()) {
+      |                                                  ^
       |
     note: hidden type `impl Future` captures lifetime smaller than the function body
      --> examples/main.rs:4:57
       |
-    4 | async fn baz<'a> (a: &'static (), b: &'_ (), c: &'_ ()) {
-      |                                                         ^
+    4 | async fn baz<'a>(a: &'static (), b: &(), c: &()) {
+      |                                                  ^
     ```
 
     <details><summary>Problematic code</summary>
 
     ```rust,compile_fail
-    async fn baz<'a> (a: &'static (), b: &'_ (), c: &'_ ()) {
+    async fn baz<'a>(a: &'static (), b: &(), c: &()) {
         /* … */
     }
     ```
@@ -132,18 +132,14 @@ an equivalent signature that soothes such a grumpy compiler 🙃
 
  1. Slap a `#[fix_hidden_lifetime_bug]` on the problematic function:
 
-    ```rust
-    # use ::fix_hidden_lifetime_bug::*;
-
+    ```rust,ignore
     #[fix_hidden_lifetime_bug] // <-- Add this!
     fn foo<'a, 'b>(it: &'a mut &'b ()) -> impl 'a + Sized {
         it
     }
     ```
 
-    ```rust
-    # use ::fix_hidden_lifetime_bug::*;
-
+    ```rust,ignore
     #[fix_hidden_lifetime_bug] // <-- Add this!
     async fn baz<'a>(fst: &'static str, snd: &str, thrd: &str) {
         /* … */
@@ -230,7 +226,7 @@ an equivalent signature that soothes such a grumpy compiler 🙃
         b: &'_0 (),
         c: &'_1 (),
     ) -> impl '__async_fut
-          + ::fix_hidden_lifetime_bug::__::core::future::Future<Output = ()>
+          + ::fix_hidden_lifetime_bug::core::future::Future<Output = ()>
           + ::fix_hidden_lifetime_bug::Captures<'a>
           + ::fix_hidden_lifetime_bug::Captures<'_0>
           + ::fix_hidden_lifetime_bug::Captures<'_1>

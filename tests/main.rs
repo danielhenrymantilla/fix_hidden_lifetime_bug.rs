@@ -13,7 +13,12 @@ async fn bar<'a> (_: &(), _b: Box<dyn Send>) {
 }
 
 #[fix_hidden_lifetime_bug]
-fn baz<'a, 'b> (it: &'a mut &'b ()) -> impl 'a + Sized {
+fn baz<'a, 'b> (it: &'a mut &'b ()) -> impl 'a + Send {
+    if false {
+        // Make sure we didn't accidentally lose the `: 'a`-ness.
+        let _: Box<dyn Send + 'a> = Box::new(baz(it));
+        loop {}
+    }
     it
 }
 

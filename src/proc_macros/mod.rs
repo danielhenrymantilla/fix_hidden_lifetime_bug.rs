@@ -64,13 +64,10 @@ fn fix_hidden_lifetime_bug (
             fix_fn(fun, None).map(ToTokens::into_token_stream)
         },
         | Item::Impl(impl_) => fix_impl(impl_).map(ToTokens::into_token_stream),
-        // | Item::Trait(trait_) => fix_trait(trait_).map(ToTokens::into_token_stream),
-        | _ => Err(Error::new(Span::call_site(), concat!(
-            "expected ",
-            "`fn`",
-            ", or `impl` block", /* Does not seem to be needed */
-            ".",
-        ))),
+        | _ => Err(Error::new(
+            Span::call_site(),
+            "expected `fn`, or `impl` block",
+        )),
     }
     .map(|output| {
         #[cfg(feature = "showme")] {
@@ -132,13 +129,6 @@ fn fix_impl (mut impl_: ItemImpl)
     })).collect::<Result<_>>()?;
     Ok(impl_.into_token_stream())
 }
-
-// fn fix_trait (mut trait_: ItemTrait)
-//   -> Result<TokenStream2>
-// {
-//     let span = trait_.trait_token.span;
-//     Err(Error::new(span, "Use `#[async_trait]` for this instead."))
-// }
 
 /* Uncomment to debug panics on parse_quote calls */
 // macro_rules! __parse_quote__ {(

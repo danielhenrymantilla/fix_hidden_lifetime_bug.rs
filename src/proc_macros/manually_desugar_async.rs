@@ -7,9 +7,11 @@ fn manually_desugar_async (
 ) -> ImplItemMethod
 {
     fun.sig.asyncness = None;
-    let ref Self_ = fun.sig.receiver().and_then(|it| {
+    // If there is a receiver *and* if it is in the shorthand form,
+    // we need to forge a `Self` type ourselves.
+    let ref Self_: Option<Type> = fun.sig.receiver().and_then(|it| {
         if let FnArg::Receiver(it) = it {
-            Some::<Type>({
+            Some({
                 let Self_ = format_ident!("Self", span = it.self_token.span);
                 parse_quote!( #Self_ )
             })
@@ -46,7 +48,7 @@ fn manually_desugar_async (
         ->
         impl
             #minimum_lifetime +
-            ::fix_hidden_lifetime_bug::__::core::future::Future<
+            ::fix_hidden_lifetime_bug::core::future::Future<
                 Output = #Ret,
             >
     );
@@ -78,17 +80,20 @@ fn manually_desugar_async (
                 | FnArg::Typed(PatType {
                     ref mut pat,
                     ..
-                }) => match **pat {
-                    | Pat::Ident(PatIdent { ref ident, .. })
-                        if ident.to_string().starts_with("__arg_").not()
-                    => {
-                        simple_name.clone_from(ident);
-                        parse_quote!( _ )
-                    },
-                    | ref mut it => ::core::mem::replace(
-                        it,
-                        parse_quote!(#simple_name),
-                    ),
+                }) => {
+                    simple_name.set_span(pat.span());
+                    match **pat {
+                        | Pat::Ident(PatIdent { ref ident, .. })
+                            if ident.to_string().starts_with("__arg_").not()
+                        => {
+                            simple_name.clone_from(ident);
+                            parse_quote!( _ )
+                        },
+                        | ref mut it => ::core::mem::replace(
+                            it,
+                            parse_quote!(#simple_name),
+                        ),
+                    }
                 },
 
                 | _ => unreachable!(),
