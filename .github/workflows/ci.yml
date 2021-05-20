@@ -9,15 +9,18 @@ on:
 jobs:
   # == CHECK == #
   check:
-    name: Check beta stable and MSRV
+    name: Quick check in stable and MSRV
     runs-on: ubuntu-latest
     strategy:
       matrix:
         rust-toolchains:
           - 1.39.0  # MSRV
           - stable
-          - beta
         features__proc-macros: ["", "--features proc-macros"]
+        features__showme: ["", "--features showme"]
+        exclude:
+          - rust-toolchains: 1.39.0
+            features__showme: "--features showme"
     steps:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
@@ -36,6 +39,7 @@ jobs:
           args: |
             --no-default-features
             ${{ matrix.features__proc-macros }}
+            ${{ matrix.features__showme }}
 
   # == BUILD & TEST == #
   build-and-test:
