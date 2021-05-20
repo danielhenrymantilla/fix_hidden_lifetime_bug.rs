@@ -256,7 +256,7 @@ an equivalent signature that soothes such a grumpy compiler 🙃
 
     Should you fix the signature, you may then be interested in:
 
-  - ### Optional `opt-out` of the magic proc-macro attribute
+  - ### Opting out of the magic proc-macro attribute
 
     If you don't want to have to recompile each time the proc-macro able to fix
     function signatures for you (_e.g._, you rather want it to [show you how to
@@ -276,4 +276,5 @@ an equivalent signature that soothes such a grumpy compiler 🙃
     fix-hidden-lifetime-bug.version = "x.y.z"
     fix-hidden-lifetime-bug.default-features = false
     ```
+
 [show you how to fix the signature]: #displaying-the-expansions

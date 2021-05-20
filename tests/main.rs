@@ -29,7 +29,13 @@ struct Foo<'inv>(
 #[fix_hidden_lifetime_bug]
 impl<'b> Foo<'b> {
     #[fix_hidden_lifetime_bug]
-    fn baz(&self, _: &()) -> impl '_ + Sized {
+    fn bar(&mut self, _: &()) -> impl '_ + Sized {
+        self
+    }
+
+    /// Since this is `async`, we are dealing with a nested `impl`.
+    #[fix_hidden_lifetime_bug]
+    async fn baz(&self, _: &()) -> impl '_ + Sized {
         self
     }
 }

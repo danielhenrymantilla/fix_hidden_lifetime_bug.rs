@@ -11,13 +11,26 @@ fn manually_unsugar_async (
 
     // 2) Introduce a new "free" lifetime parameter, which will be the `'lt`
     // in `-> impl 'lt + Future…`
+    // For such a lifetime to work (for the body of the function to compile)
+    // we need the types of each parameter (captured by the future) to
+    // be "usable within that `'lt`", _.i.e_, we need `ArgTy : 'lt` to hold
+    // for each `ArgTy` (including `Self`).
     let ref Self_: Option<Type> = fun.sig.receiver().and_then(|it| {
         // If there is a receiver *and* if it is in the shorthand form,
         // we need to forge a `Self` type ourselves.
-        if let FnArg::Receiver(it) = it {
+        if let FnArg::Receiver(rc) = it {
             Some({
-                let Self_ = format_ident!("Self", span = it.self_token.span);
-                parse_quote!( #Self_ )
+                let Self_ = format_ident!("Self", span = rc.self_token.span);
+                // If `Some`, it bundles a named lifetime, by construction.
+                if let Some((ref amp, ref lt)) = rc.reference {
+                    parse_quote!(
+                        #amp #lt #Self_
+                    )
+                } else {
+                    parse_quote!(
+                        #Self_
+                    )
+                }
             })
         } else {
             None
