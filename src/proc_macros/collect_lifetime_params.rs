@@ -35,6 +35,9 @@ fn collect_lifetime_params (
             params: &mut item_impl.generics.params,
         };
         if let Some((_, ref mut trait_, _)) = item_impl.trait_ {
+            // Currently unreachable since we guard against this;
+            // but keeping this to avoid forgetting about this should support
+            // for trait sbe added.
             visitor.visit_path_mut(trait_);
         }
         visitor.visit_type_mut(&mut *item_impl.self_ty);
@@ -47,7 +50,8 @@ fn collect_lifetime_params (
 
 struct Visitor<'__> {
     lifetimes: &'__ mut Vec<Lifetime>,
-    next_idx: ::core::ops::RangeFrom<u16>, // No more that 64K lifetimes, methinks 🙃
+    // No more than 64K lifetimes, methinks 🙃
+    next_idx: ::core::ops::RangeFrom<u16>,
     params: &'__ mut Punctuated<GenericParam, Token![,]>,
 }
 

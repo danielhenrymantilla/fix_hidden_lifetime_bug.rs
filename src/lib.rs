@@ -62,10 +62,11 @@ trait MentionsTy<__ : ?Sized> {}
 
 impl<T : ?Sized, __ : ?Sized> MentionsTy<__> for T {}
 
-#[doc(hidden)] /** Not part of the public API! */ pub
-mod __ {
-    pub use ::core;
-}
+/// For compatibility with the `showme` feature to Just Work™,
+/// this re-export *is* (exceptionally) part of the public API 🤯
+/// Still hiding it because it'd look weird at first flance 😅
+#[doc(hidden)]
+pub use ::core;
 
 #[cfg(feature = "proc-macros")]
 extern crate proc_macros;
