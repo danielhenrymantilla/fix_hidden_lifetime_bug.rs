@@ -15,7 +15,7 @@ https://github.com/danielhenrymantilla/fix_hidden_lifetime_bug.rs/blob/master/LI
 [![CI](https://github.com/danielhenrymantilla/fix_hidden_lifetime_bug.rs/workflows/CI/badge.svg)](
 https://github.com/danielhenrymantilla/fix_hidden_lifetime_bug.rs/actions)
 
-### Are you getting one of the two following errors (E700)?
+### Are you getting one of the following errors (E700)?
 
   - ```rust,ignore
     error[E0700]: hidden type for `impl Trait` captures lifetime that does not appear in bounds
