@@ -4,7 +4,7 @@
 
 extern crate proc_macro;
 
-use ::core::ops::Not as _;
+use ::core::{mem, ops::Not as _};
 use ::proc_macro::TokenStream;
 use ::proc_macro2::{
     Span,
@@ -27,7 +27,7 @@ use ::syn::{*,
 use self::{
     append_captures_hack_to_impl_occurrences::append_captures_hack_to_impl_occurrences,
     collect_lifetime_params::collect_lifetime_params,
-    manually_desugar_async::manually_desugar_async,
+    manually_unsugar_async::manually_unsugar_async,
     params::Params,
 };
 
@@ -35,7 +35,7 @@ mod append_captures_hack_to_impl_occurrences;
 
 mod collect_lifetime_params;
 
-mod manually_desugar_async;
+mod manually_unsugar_async;
 
 mod params;
 
@@ -89,7 +89,7 @@ fn fix_fn (
 {
     let ref lifetimes = collect_lifetime_params(&mut fun.sig, outer_scope);
     if fun.sig.asyncness.is_some() {
-        fun = manually_desugar_async(fun);
+        fun = manually_unsugar_async(fun);
     }
     append_captures_hack_to_impl_occurrences(
         lifetimes,
@@ -107,7 +107,7 @@ fn fix_impl (mut impl_: ItemImpl)
             "`#[fix_hidden_lifetime_bug]` does not support traits yet.",
         ));
     }
-    let items = ::core::mem::replace(&mut impl_.items, vec![]);
+    let items = mem::replace(&mut impl_.items, vec![]);
     impl_.items = items.into_iter().map(|it| Ok(match it {
         | ImplItem::Method(mut fun) => {
             let mut process_current = false;
