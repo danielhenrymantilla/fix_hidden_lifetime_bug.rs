@@ -25,6 +25,7 @@ default = [
 showme = [
     "proc-macros/showme",
 ]
+nightly = []
 
 [package.metadata.docs.rs]
 targets = [
