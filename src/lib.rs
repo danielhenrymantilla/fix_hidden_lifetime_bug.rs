@@ -1,8 +1,9 @@
 #![no_std]
 #![cfg_attr(doc,
-    feature(doc_cfg, external_doc),
-    doc(include = "../README.md"),
+    feature(doc_cfg),
+    cfg_attr(all(), doc = include_str!("../README.md")),
 )]
+
 // Fix rendering of `<details><summary>` within bulleted lists:
 // Credit for this marvelous hack go to: https://github.com/rust-lang/cargo/issues/331#issuecomment-479847157
 #![doc(html_favicon_url = "\">
