@@ -56,7 +56,7 @@ jobs:
         rust-toolchains:
           - 1.39.0
           - stable
-          - beta
+          - nightly
         exclude:
           # This setup very often fails with a memory allocation failure on GH.
           - os: windows-latest
@@ -72,10 +72,21 @@ jobs:
       - name: Clone repo
         uses: actions/checkout@v2
 
-      - name: Cargo test
+      - name: Cargo test (nightly)
+        if: matrix.rust-toolchains == 'nightly'
         uses: actions-rs/cargo@v1
-        env:
-          RUSTC_BOOTSTRAP: 1
+        with:
+          command: test
+          args: |
+            --doc
+            --no-default-features
+            --features proc-macros
+            --features nightly
+            -- --nocapture
+
+      - name: Cargo test
+        if: matrix.rust-toolchains != 'nightly'
+        uses: actions-rs/cargo@v1
         with:
           command: test
           args: |

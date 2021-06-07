@@ -1,5 +1,5 @@
 #![no_std]
-#![cfg_attr(doc,
+#![cfg_attr(feature = "nightly",
     feature(doc_cfg),
     cfg_attr(all(), doc = include_str!("../README.md")),
 )]

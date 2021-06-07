@@ -210,9 +210,9 @@ an equivalent signature that soothes such a grumpy compiler 🙃
     <details><summary>Example</summary>
 
     ```rust,ignore
-    use ::fix_hidden_lifetime_params::fix_hidden_lifetime_params;
+    use ::fix_hidden_lifetime_bug::fix_hidden_lifetime_bug;
 
-    #[fix_hidden_lifetime_params(showme)]
+    #[fix_hidden_lifetime_bug(showme)]
     async fn baz<'a>(a: &'static (), b: &'_ (), c: &'_ ()) {
         println!("Hello, World!");
     }
