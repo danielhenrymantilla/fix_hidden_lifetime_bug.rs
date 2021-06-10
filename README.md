@@ -118,7 +118,7 @@ an equivalent signature that soothes such a grumpy compiler 🙃
 
     ```toml
     [dependencies]
-    fix_hidden_lifetime_bug = "x.y.z"
+    fix-hidden-lifetime-bug = "x.y.z"
     ```
 
       - where you can find the version using `cargo search fix_hidden_lifetime_bug`
@@ -196,15 +196,15 @@ an equivalent signature that soothes such a grumpy compiler 🙃
 
     ```toml
     [dependencies]
-    fix_hidden_lifetime_params.version = "x.y.z"
-    fix_hidden_lifetime_params.features = ["showme"]
+    fix-hidden-lifetime-bug.version = "x.y.z"
+    fix-hidden-lifetime-bug.features = ["showme"]
     ```
 
     you can then feed a `showme` parameter to specific
-    `#[fix_hidden_lifetime_params]` annotations, as follows:
+    `#[fix_hidden_lifetime_bug]` annotations, as follows:
 
     ```rust,ignore
-    #[fix_hidden_lifetime_params(showme)]
+    #[fix_hidden_lifetime_bug(showme)]
     ```
 
     <details><summary>Example</summary>
