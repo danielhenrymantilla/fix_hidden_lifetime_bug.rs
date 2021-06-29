@@ -237,7 +237,7 @@ an equivalent signature that soothes such a grumpy compiler 🙃
     {
         async move {
             "Mention the input vars so that they get captured by the Future";
-            let (_, _, _) = (a, b, c);
+            let (a, b, c) = (a, b, c);
             println!("Hello, World!");
         }
     }
