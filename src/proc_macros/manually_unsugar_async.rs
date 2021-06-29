@@ -121,7 +121,7 @@ fn manually_unsugar_async (
                                 if ident.to_string().starts_with("__arg_").not()
                             => {
                                 simple_name.clone_from(ident);
-                                parse_quote!( _ )
+                                (**pat).clone()
                             },
                             | ref mut it => mem::replace(
                                 it,
