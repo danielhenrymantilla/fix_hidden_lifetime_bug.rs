@@ -2,6 +2,11 @@
 
 use ::fix_hidden_lifetime_bug::fix_hidden_lifetime_bug;
 
+#[cfg(feature = "nightly")]
+mod regressions {
+    ::automod::dir!("tests/regressions");
+}
+
 #[fix_hidden_lifetime_bug]
 async fn foo<'a> (a: &'static (), b: &'_ (), c: &'_ ()) {
     /* … */

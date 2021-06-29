@@ -38,3 +38,6 @@ features = [
 
 [workspace]
 members = ["src/proc_macros"]
+
+[dev-dependencies]
+automod = "1.0.2"
