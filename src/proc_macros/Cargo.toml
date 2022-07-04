@@ -23,7 +23,7 @@ syn.version = "1.0.7"
 syn.features = ["full", "visit-mut"]
 
 bat.optional = true
-bat.version = "0.15.4"
+bat.version = "0.18.2"
 
 [features]
 default = []
