@@ -3,6 +3,7 @@ use super::*;
 /// Transform an `async fn` into an equivalent `fn … -> impl Future` signature.
 pub(in crate)
 fn manually_unsugar_async (
+    krate: &'_ Path,
     mut fun: ImplItemMethod,
 ) -> ImplItemMethod
 {
@@ -65,10 +66,9 @@ fn manually_unsugar_async (
         | ReturnType::Default => parse_quote!( () ),
     };
     fun.sig.output = parse_quote!(
-        ->
-        impl
+        -> impl
             #minimum_lifetime +
-            ::fix_hidden_lifetime_bug::core::future::Future<
+            #krate::core::future::Future<
                 Output = #Ret,
             >
     );
