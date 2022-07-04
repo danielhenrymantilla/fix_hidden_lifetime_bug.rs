@@ -388,7 +388,7 @@ checksum = "e88a8acf291dafb59c2d96e8f59828f3838bb1a70398823ade51a84de6a6deed"
 
 [[package]]
 name = "fix-hidden-lifetime-bug"
-version = "0.2.4"
+version = "0.2.5"
 dependencies = [
  "automod",
  "fix-hidden-lifetime-bug-proc_macros",
@@ -396,7 +396,7 @@ dependencies = [
 
 [[package]]
 name = "fix-hidden-lifetime-bug-proc_macros"
-version = "0.2.4"
+version = "0.2.5"
 dependencies = [
  "bat",
  "proc-macro2",

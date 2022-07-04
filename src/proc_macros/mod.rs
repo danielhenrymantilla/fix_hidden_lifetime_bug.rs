@@ -50,26 +50,29 @@ fn fix_hidden_lifetime_bug (
 ) -> TokenStream
 {
     let Params {
+        krate,
         showme,
     } = parse_macro_input!(attrs);
-    let _ = showme;
+    let ref krate = krate.unwrap_or_else(|| parse_quote!(
+        ::fix_hidden_lifetime_bug
+    ));
     match parse_macro_input!(input) {
         | Item::Fn(ItemFn {
             attrs, vis, sig, block,
         }) => {
             let fun = ImplItemMethod {
-                attrs, vis, sig, block: *block,
-                defaultness: None,
+                attrs, vis, sig, block: *block, defaultness: None,
             };
-            fix_fn(fun, None).map(ToTokens::into_token_stream)
+            fix_fn(krate, fun, None).map(ToTokens::into_token_stream)
         },
-        | Item::Impl(impl_) => fix_impl(impl_).map(ToTokens::into_token_stream),
+        | Item::Impl(impl_) => fix_impl(krate, impl_).map(ToTokens::into_token_stream),
         | _ => Err(Error::new(
             Span::call_site(),
             "expected `fn`, or `impl` block",
         )),
     }
     .map(|output| {
+        let _ = showme;
         #[cfg(feature = "showme")] {
             if showme.is_some() {
                 showme::pretty_print_tokenstream(&output);
@@ -83,23 +86,27 @@ fn fix_hidden_lifetime_bug (
 }
 
 fn fix_fn (
+    krate: &'_ Path,
     mut fun: ImplItemMethod,
     outer_scope: Option<&'_ mut ItemImpl>,
 ) -> Result<ImplItemMethod>
 {
     let ref lifetimes = collect_lifetime_params(&mut fun.sig, outer_scope);
     if fun.sig.asyncness.is_some() {
-        fun = manually_unsugar_async(fun);
+        fun = manually_unsugar_async(krate, fun);
     }
     append_captures_hack_to_impl_occurrences(
+        krate,
         lifetimes,
         &mut fun.sig.output,
     );
     Ok(fun)
 }
 
-fn fix_impl (mut impl_: ItemImpl)
-  -> Result<TokenStream2>
+fn fix_impl (
+    krate: &'_ Path,
+    mut impl_: ItemImpl,
+) -> Result<TokenStream2>
 {
     if let Some((_, ref trait_, _)) = impl_.trait_ {
         return Err(Error::new_spanned(
@@ -121,7 +128,7 @@ fn fix_impl (mut impl_: ItemImpl)
                 }
             ));
             if process_current {
-                fun = fix_fn(fun, Some(&mut impl_))?;
+                fun = fix_fn(krate, fun, Some(&mut impl_))?;
             }
             ImplItem::Method(fun)
         },

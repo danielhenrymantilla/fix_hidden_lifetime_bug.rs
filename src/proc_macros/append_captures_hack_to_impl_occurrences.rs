@@ -2,15 +2,17 @@ use super::*;
 
 pub
 fn append_captures_hack_to_impl_occurrences (
+    krate: &'_ Path,
     lifetimes: &'_ [Lifetime],
     output: &'_ mut ReturnType,
 )
 {
     // use a visitor to make sure _all_ the `impl` occurrences are changed.
-    Visitor { lifetimes }.visit_return_type_mut(output);
+    Visitor { krate, lifetimes }.visit_return_type_mut(output);
 }
 
 struct Visitor<'__> {
+    krate: &'__ Path,
     lifetimes: &'__ [Lifetime],
 }
 
@@ -32,9 +34,10 @@ impl VisitMut for Visitor<'_> {
             let lifetimes_to_skip = find_all_lifetimes_in_impl_trait(impl_trait);
             move |lt| lifetimes_to_skip.contains(lt).not()
         });
+        let krate = self.krate;
         impl_trait.bounds.extend(lifetimes_to_add.map(|lt| -> TypeParamBound {
             parse_quote!(
-                ::fix_hidden_lifetime_bug::Captures<#lt>
+                #krate::Captures<#lt>
             )
         }));
     }
