@@ -59,11 +59,13 @@ https://github.com/danielhenrymantilla/fix_hidden_lifetime_bug.rs/actions)
 
     <details><summary>Problematic code</summary>
 
-    ```rust,compile_fail
+    ```rust ,ignore
     async fn bar<'a> (_: &(), _: Box<dyn Send>) {
         /* … */
     }
     ```
+
+    EDIT: Fixed as of 1.69.0
 
     </details>
 
@@ -85,11 +87,13 @@ https://github.com/danielhenrymantilla/fix_hidden_lifetime_bug.rs/actions)
 
     <details><summary>Problematic code</summary>
 
-    ```rust,compile_fail
+    ```rust ,ignore
     async fn baz<'a>(a: &'static (), b: &(), c: &()) {
         /* … */
     }
     ```
+
+    EDIT: Fixed as of 1.69.0
 
     </details>
 
