@@ -20,7 +20,7 @@ jobs:
           - macos-latest
           - windows-latest
         rust-toolchains:
-          - 1.39.0
+          - 1.65.0
           - stable
           - beta
           - nightly
@@ -28,7 +28,7 @@ jobs:
         exclude:
           # This setup very often fails with a memory allocation failure on GH.
           - os: windows-latest
-            rust-toolchains: 1.39.0
+            rust-toolchains: 1.65.0
     steps:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
