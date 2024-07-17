@@ -6,7 +6,7 @@ https://github.com/danielhenrymantilla/fix_hidden_lifetime_bug.rs)
 https://crates.io/crates/fix-hidden-lifetime-bug)
 [![Documentation](https://docs.rs/fix-hidden-lifetime-bug/badge.svg)](
 https://docs.rs/fix-hidden-lifetime-bug)
-[![MSRV](https://img.shields.io/badge/MSRV-1.39.0-white)](
+[![MSRV](https://img.shields.io/badge/MSRV-1.65.0-white)](
 https://gist.github.com/danielhenrymantilla/8e5b721b3929084562f8f65668920c33)
 [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](
 https://github.com/rust-secure-code/safety-dance/)
@@ -59,11 +59,13 @@ https://github.com/danielhenrymantilla/fix_hidden_lifetime_bug.rs/actions)
 
     <details><summary>Problematic code</summary>
 
-    ```rust,compile_fail
+    ```rust ,ignore
     async fn bar<'a> (_: &(), _: Box<dyn Send>) {
         /* … */
     }
     ```
+
+    EDIT: Fixed as of 1.69.0
 
     </details>
 
@@ -85,11 +87,13 @@ https://github.com/danielhenrymantilla/fix_hidden_lifetime_bug.rs/actions)
 
     <details><summary>Problematic code</summary>
 
-    ```rust,compile_fail
+    ```rust ,ignore
     async fn baz<'a>(a: &'static (), b: &(), c: &()) {
         /* … */
     }
     ```
+
+    EDIT: Fixed as of 1.69.0
 
     </details>
 

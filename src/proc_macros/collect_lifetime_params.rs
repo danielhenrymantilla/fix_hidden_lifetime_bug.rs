@@ -160,4 +160,28 @@ impl VisitMut for Visitor<'_> {
             dyn_trait.bounds.push(TypeParamBound::Lifetime(lt));
         }
     }
+
+    fn visit_type_mut (
+        self: &'_ mut Self,
+        type_: &mut Type,
+    )
+    {
+        // Subrecurse.
+        visit_mut::visit_type_mut(self, type_);
+        // When adding the `+ 'lt` as in our `dyn_trait.bounds.push()` above,
+        // we may end up with `&dyn Trait` becoming `&dyn Trait + '…`, which is
+        // not valid Rust (disambiguating parentheses are then required),
+        // see https://github.com/danielhenrymantilla/fix_hidden_lifetime_bug.rs/issues/12
+        match type_ {
+            Type::Reference(ref_) => match &*ref_.elem {
+                Type::TraitObject(dyn_trait) if dyn_trait.bounds.len() > 1 => {
+                    *ref_.elem = parse_quote_spanned!(dyn_trait.span()=>
+                        ( #dyn_trait )
+                    );
+                },
+                _ => {},
+            },
+            _ => {},
+        }
+    }
 }
