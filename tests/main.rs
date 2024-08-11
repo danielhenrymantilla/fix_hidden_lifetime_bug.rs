@@ -22,7 +22,7 @@ fn baz<'a, 'b> (it: &'a mut &'b ()) -> impl 'a + Send {
     if false {
         // Make sure we didn't accidentally lose the `: 'a`-ness.
         let _: Box<dyn Send + 'a> = Box::new(baz(it));
-        loop {}
+        unreachable!();
     }
     it
 }

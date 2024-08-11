@@ -1,4 +1,4 @@
-#![allow(nonstandard_style, unused_imports)]
+#![allow(nonstandard_style, unused_imports, clippy::complexity, clippy::style)]
 
 //! Internal crate, do not use it directly.
 
@@ -100,6 +100,9 @@ fn fix_fn (
         lifetimes,
         &mut fun.sig.output,
     );
+    fun.attrs.push(parse_quote!(
+        #[allow(clippy::style, clippy::pedantic, clippy::complexity)]
+    ));
     Ok(fun)
 }
 
@@ -114,7 +117,7 @@ fn fix_impl (
             "`#[fix_hidden_lifetime_bug]` does not support traits yet.",
         ));
     }
-    let items = mem::replace(&mut impl_.items, vec![]);
+    let items = mem::take(&mut impl_.items);
     impl_.items = items.into_iter().map(|it| Ok(match it {
         | ImplItem::Method(mut fun) => {
             let mut process_current = false;

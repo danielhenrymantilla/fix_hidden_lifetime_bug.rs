@@ -340,7 +340,7 @@ dependencies = [
 
 [[package]]
 name = "fix-hidden-lifetime-bug"
-version = "0.2.6"
+version = "0.2.7"
 dependencies = [
  "automod",
  "fix-hidden-lifetime-bug-proc_macros",
@@ -348,7 +348,7 @@ dependencies = [
 
 [[package]]
 name = "fix-hidden-lifetime-bug-proc_macros"
-version = "0.2.6"
+version = "0.2.7"
 dependencies = [
  "bat",
  "proc-macro2",
